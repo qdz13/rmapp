@@ -11,5 +11,5 @@ Note that this program is only available in macOS.
 
 ## Usage
 ```sh
-rmapp keyword
+$ rmapp keyword
 ```
