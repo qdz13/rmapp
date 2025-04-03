@@ -9,7 +9,7 @@ if [ "$(uname)" != "Darwin" ]; then
 fi
 
 usage() {
-	cat <<-'EOF' >&2
+	cat >&2 <<-'EOF'
 		Usage: rmapp [OPTION] [STRING]
 
 		Options:
