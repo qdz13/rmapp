@@ -1,0 +1,166 @@
+#!/usr/bin/env bash
+# shellcheck disable=SC2001
+
+version=1.0.0
+
+if [ "$(uname)" != "Darwin" ]; then
+	echo "This program is only available on macOS." >&2
+	exit 1
+fi
+
+usage() {
+	cat <<-'EOF' >&2
+		Usage: rmapp [OPTION] [STRING]
+
+		Options:
+		  -h, --help    Display this help message and exit
+		  -v, --version Display version information and exit
+		  -c, --check   Display all matched files and exit
+		  -s, --silent  Silent mode
+		EOF
+}
+
+case $# in
+	1)
+		if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+			usage
+			exit
+		elif [ "$1" = "-v" ] || [ "$1" = "--version" ]; then
+			echo "rmapp $version" >&2
+			exit
+		else
+			mode="normal"
+			keyword="$1"
+		fi
+		;;
+	2)
+		if [ "$1" = "-c" ] || [ "$1" = "--check" ]; then
+			mode="check"
+			keyword="$2"
+		elif [ "$1" = "-s" ] || [ "$1" = "--silent" ]; then
+			mode="silent"
+			keyword="$2"
+		else
+			usage
+			exit 1
+		fi
+		;;
+	*)
+		usage
+		exit 1
+		;;
+esac
+
+IFS_SAVE="$IFS"
+IFS=$'\n'
+
+check() {
+	local result
+	result=$(find "$1" -iname "*$keyword*" -maxdepth 1 -print 2> /dev/null)
+	if [ -n "$result" ]; then
+		for line in $result; do
+			all[count]="$line"
+			count=$((count + 1))
+		done
+	fi
+}
+
+count=0
+all=()
+
+check "$HOME/.cache"
+check "$HOME/.config"
+check "$HOME/.local/share"
+check "$HOME/.local/state"
+check "$HOME/Library"
+check "$HOME/Library/Application Scripts"
+check "$HOME/Library/Application Support"
+check "$HOME/Library/Application Support/CrashReporter"
+check "$HOME/Library/Caches"
+check "$HOME/Library/Containers"
+check "$HOME/Library/Group Containers"
+check "$HOME/Library/HTTPStorages"
+check "$HOME/Library/Internet Plug-Ins"
+check "$HOME/Library/LaunchAgents"
+check "$HOME/Library/Logs"
+check "$HOME/Library/Logs/DiagnosticReports"
+check "$HOME/Library/Preferences"
+check "$HOME/Library/Preferences/ByHost"
+check "$HOME/Library/Saved Application State"
+check "$HOME/Library/WebKit"
+check "/Library"
+check "/Library/Application Support"
+check "/Library/Application Support/CrashReporter"
+check "/Library/Caches"
+check "/Library/Extensions"
+check "/Library/Internet Plug-Ins"
+check "/Library/LaunchAgents"
+check "/Library/LaunchDaemons"
+check "/Library/Logs"
+check "/Library/Logs/DiagnosticReports"
+check "/Library/Preferences"
+check "/Library/PrivilegedHelperTools"
+check "/private/var/db/receipts"
+check "/usr/local/bin"
+check "/usr/local/etc"
+check "/usr/local/opt"
+check "/usr/local/sbin"
+check "/usr/local/share"
+check "/usr/local/var"
+
+IFS="$IFS_SAVE"
+
+if [ "$mode" = "check" ]; then
+	for filename in "${all[@]}"; do
+		sed "s|^$HOME|~|" <<< "$filename"
+	done
+	exit
+fi
+
+remove() {
+	osascript -e 'tell application "Finder" to delete POSIX file "'"$1"\" > /dev/null
+}
+
+if [ "$mode" = "silent" ]; then
+	for filename in "${all[@]}"; do
+		remove "$filename"
+	done
+	exit
+fi
+
+if [ ${#all[@]} -gt 25 ]; then
+	for filename in "${all[@]}"; do
+		echo "$filename"
+	done
+	echo "Too many items!" >&2
+	exit
+fi
+
+[ ${#all[@]} -eq 0 ] && exit
+
+count=0
+
+for filename in "${all[@]}"; do
+	count=$((count + 1))
+	echo -n "$count "
+	sed "s|^$HOME|~|" <<< "$filename"
+done
+
+read -r -p "Enter the number of the files/dirs you want to delete: " answer
+
+if [ -z "$answer" ]; then
+	exit
+elif [ "$answer" = "*" ] || [ "$answer" = all ]; then
+	for filename in "${all[@]}"; do
+		remove "$filename"
+	done
+	exit
+fi
+
+for number in $answer; do
+	if [[ "$number" =~ ^[1-9][0-9]?$ ]] && [ "$number" -le ${#all[@]} ]; then
+		[ -e "${all[$((number - 1))]}" ] && remove "${all[$((number - 1))]}"
+	else
+		echo "Invalid choice: $number" >&2
+	fi
+done
