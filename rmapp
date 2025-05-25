@@ -3,7 +3,7 @@
 
 version=1.0.0
 
-if [ "$(uname)" != "Darwin" ]; then
+if ! [[ "$OSTYPE" =~ ^darwin ]]; then
 	echo "This program is only available on macOS." >&2
 	exit 1
 fi
