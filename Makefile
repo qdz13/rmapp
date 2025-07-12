@@ -2,6 +2,7 @@ VERSION=1.0.0
 
 PREFIX = /usr/local
 MANPREFIX = ${PREFIX}/share/man
+RM = rm -f
 
 all:
 	@echo "Run \"sudo make install\" to install rmapp."
@@ -14,6 +15,6 @@ install:
 	chmod 644 ${DESTDIR}${MANPREFIX}/man1/rmapp.1
 
 uninstall:
-	rm -f ${DESTDIR}${PREFIX}/bin/rmapp ${DESTDIR}${MANPREFIX}/man1/rmapp.1
+	${RM} ${DESTDIR}${PREFIX}/bin/rmapp ${DESTDIR}${MANPREFIX}/man1/rmapp.1
 
 .PHONY: all install uninstall
