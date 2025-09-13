@@ -7,7 +7,8 @@ git clone https://github.com/qdz13/rmapp
 cd rmapp
 sudo make install
 ```
-Note that this program is only available in macOS.
+> [!NOTE]
+> This program is only works in macOS.
 
 ## Usage
 ```sh
