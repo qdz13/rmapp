@@ -3,7 +3,7 @@ rmapp is a simple command-line tool that helps you delete leftover files of macO
 
 ## Installation
 ```sh
-git clone https://github.com/qdz13/rmapp
+git clone https://codeberg.org/qdz13/rmapp.git
 cd rmapp
 sudo make install
 ```
