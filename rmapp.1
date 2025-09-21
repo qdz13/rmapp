@@ -1,21 +1,26 @@
-.TH RMAPP "1" "December 27, 2024" "rmapp VERSION"
-.SH NAME
-rmapp \- delete leftover files of macOS applications
-.SH SYNOPSIS
-.B rmapp
-[OPTION] [STRING]
-.SH DESCRIPTION
-rmapp is a simple command-line tool that helps you delete leftover files of macOS applications. Specify a keyword as an argument, find files, and select files you want to delete.
-.SH OPTIONS
-.TP
--h, --help
-Display a short help message and exit.
-.TP
--v, --version
-Display version information and exit.
-.TP
--c, --check
-Display all matched files and exit.
-.TP
--s, --silent
-Silent mode
+.Dd September 21, 2025
+.Dt RMAPP 1
+.Os
+.Sh NAME
+.Nm rmapp
+.Nd Delete leftover files of macOS applications
+.Sh SYNOPSIS
+.Nm rmapp
+.Op Fl chsv
+.Op Ar string
+.Sh DESCRIPTION
+.Nm
+is a simple command-line tool that helps you delete leftover files of macOS applications.
+Specify a keyword as an argument, find files, and select files you want to delete.
+.Pp
+Supported options:
+.Bl -tag -width Ds
+.It Fl c , Fl Fl check
+Display all matched files and exit
+.It Fl s , Fl Fl silent
+Silent mode: Suppress normal output
+.It Fl h , Fl Fl help
+Display help message
+.It Fl v , Fl Fl version
+Display version information
+.El
