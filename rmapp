@@ -71,14 +71,14 @@ check() {
 	result=$(find "$1" -iname "*$keyword*" -maxdepth 1 -print 2> /dev/null)
 	if [ -n "$result" ]; then
 		for line in $result; do
-			all[count]="$line"
+			items[count]="$line"
 			count=$((count + 1))
 		done
 	fi
 }
 
 count=0
-all=()
+declare -a items
 
 check "$HOME/.cache"
 check "$HOME/.config"
@@ -123,7 +123,7 @@ check "/usr/local/var"
 IFS="$oldifs"
 
 if [ "$mode" = check ]; then
-	for filename in "${all[@]}"; do
+	for filename in "${items[@]}"; do
 		sed "s|^$HOME|~|" <<< "$filename"
 	done
 	exit
@@ -134,25 +134,25 @@ remove() {
 }
 
 if [ "$mode" = silent ]; then
-	for filename in "${all[@]}"; do
+	for filename in "${items[@]}"; do
 		remove "$filename"
 	done
 	exit
 fi
 
-if [ ${#all[@]} -gt 25 ]; then
-	for filename in "${all[@]}"; do
+if [ ${#items[@]} -gt 25 ]; then
+	for filename in "${items[@]}"; do
 		echo "$filename"
 	done
 	echo "$progname: Too many items!" >&2
 	exit
 fi
 
-[ ${#all[@]} -eq 0 ] && exit
+[ ${#items[@]} -eq 0 ] && exit
 
 count=0
 
-for filename in "${all[@]}"; do
+for filename in "${items[@]}"; do
 	count=$((count + 1))
 	echo -n "$count "
 	sed "s|^$HOME|~|" <<< "$filename"
@@ -163,15 +163,15 @@ read -r -p "Enter the number of the files/dirs you want to delete: " answer
 if [ -z "$answer" ]; then
 	exit
 elif [ "$answer" = "*" ] || [ "$answer" = all ]; then
-	for filename in "${all[@]}"; do
+	for filename in "${items[@]}"; do
 		remove "$filename"
 	done
 	exit
 fi
 
 for number in $answer; do
-	if [[ "$number" =~ ^[1-9][0-9]?$ ]] && [ "$number" -le ${#all[@]} ]; then
-		[ -e "${all[$((number - 1))]}" ] && remove "${all[$((number - 1))]}"
+	if [[ "$number" =~ ^[1-9][0-9]?$ ]] && [ "$number" -le ${#items[@]} ]; then
+		[ -e "${items[$((number - 1))]}" ] && remove "${items[$((number - 1))]}"
 	else
 		echo "$progname: Invalid choice: $number" >&2
 	fi
