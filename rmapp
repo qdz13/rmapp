@@ -140,7 +140,7 @@ if [ "$mode" = silent ]; then
 	exit
 fi
 
-if [ ${#items[@]} -gt 25 ]; then
+if [ ${#items[@]} -gt $(($(tput lines) - 1)) ]; then
 	for filename in "${items[@]}"; do
 		echo "$filename"
 	done
