@@ -1,5 +1,3 @@
-VERSION=1.0.1
-
 PREFIX = /usr/local
 MANPREFIX = ${PREFIX}/share/man
 RM = rm -f
@@ -11,8 +9,7 @@ install:
 	mkdir -p ${DESTDIR}${PREFIX}/bin
 	install -Dm755 rmapp ${DESTDIR}${PREFIX}/bin/rmapp
 	mkdir -p ${DESTDIR}${MANPREFIX}/man1
-	sed "s/VERSION/${VERSION}/g" < rmapp.1 > ${DESTDIR}${MANPREFIX}/man1/rmapp.1
-	chmod 644 ${DESTDIR}${MANPREFIX}/man1/rmapp.1
+	install -Dm644 rmapp ${DESTDIR}${MANPREFIX}/man1/rmapp
 
 uninstall:
 	${RM} ${DESTDIR}${PREFIX}/bin/rmapp ${DESTDIR}${MANPREFIX}/man1/rmapp.1
