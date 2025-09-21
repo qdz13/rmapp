@@ -21,38 +21,49 @@ usage() {
 		EOF
 }
 
-case $# in
-	1)
-		if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
-			usage
-			exit
-		elif [ "$1" = "-v" ] || [ "$1" = "--version" ]; then
-			echo "$progname $version" >&2
-			exit
-		else
-			mode="normal"
-			keyword="$1"
-		fi
-		;;
-	2)
-		if [ "$1" = "-c" ] || [ "$1" = "--check" ]; then
-			mode="check"
-			keyword="$2"
-		elif [ "$1" = "-s" ] || [ "$1" = "--silent" ]; then
-			mode="silent"
-			keyword="$2"
-		else
-			usage
-			exit 1
-		fi
-		;;
-	*)
-		usage
-		exit 1
-		;;
-esac
+optend=false
+mode=normal
+declare keyword
+while [ $# -ne 0 ]; do
+	if [ "$optend" = true ]; then
+		keyword="$1"
+		shift
+	else
+		case "$1" in
+			-c|--check)
+				mode=check
+				shift
+				;;
+			-s|--silent)
+				mode=silent
+				keyword="$1"
+				shift
+				;;
+			-h|--help)
+				usage
+				exit
+				;;
+			-v|--version)
+				echo "$progname $version"
+				exit
+				;;
+			--)
+				optend=true
+				shift
+				;;
+			-*)
+				echo "$progname: Unknown option: \"$1\"" >&2
+				exit 1
+				;;
+			*)
+				keyword="$1"
+				shift
+				;;
+		esac
+	fi
+done
 
-IFS_SAVE="$IFS"
+oldifs="$IFS"
 IFS=$'\n'
 
 check() {
@@ -109,9 +120,9 @@ check "/usr/local/sbin"
 check "/usr/local/share"
 check "/usr/local/var"
 
-IFS="$IFS_SAVE"
+IFS="$oldifs"
 
-if [ "$mode" = "check" ]; then
+if [ "$mode" = check ]; then
 	for filename in "${all[@]}"; do
 		sed "s|^$HOME|~|" <<< "$filename"
 	done
@@ -122,7 +133,7 @@ remove() {
 	osascript -e 'tell application "Finder" to delete POSIX file "'"$1"\" > /dev/null
 }
 
-if [ "$mode" = "silent" ]; then
+if [ "$mode" = silent ]; then
 	for filename in "${all[@]}"; do
 		remove "$filename"
 	done
@@ -133,7 +144,7 @@ if [ ${#all[@]} -gt 25 ]; then
 	for filename in "${all[@]}"; do
 		echo "$filename"
 	done
-	echo "Too many items!" >&2
+	echo "$progname: Too many items!" >&2
 	exit
 fi
 
@@ -162,6 +173,6 @@ for number in $answer; do
 	if [[ "$number" =~ ^[1-9][0-9]?$ ]] && [ "$number" -le ${#all[@]} ]; then
 		[ -e "${all[$((number - 1))]}" ] && remove "${all[$((number - 1))]}"
 	else
-		echo "Invalid choice: $number" >&2
+		echo "$progname: Invalid choice: $number" >&2
 	fi
 done
