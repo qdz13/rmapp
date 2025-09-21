@@ -72,7 +72,7 @@ check() {
 	if [ -n "$result" ]; then
 		for line in $result; do
 			items[count]="$line"
-			count=$((count + 1))
+			((count++))
 		done
 	fi
 }
@@ -122,6 +122,8 @@ check "/usr/local/var"
 
 IFS="$oldifs"
 
+[ ${#items[@]} -eq 0 ] && exit
+
 if [ "$mode" = check ]; then
 	for filename in "${items[@]}"; do
 		sed "s|^$HOME|~|" <<< "$filename"
@@ -148,13 +150,10 @@ if [ ${#items[@]} -gt $(($(tput lines) - 1)) ]; then
 	exit
 fi
 
-[ ${#items[@]} -eq 0 ] && exit
-
 count=0
-
 for filename in "${items[@]}"; do
-	count=$((count + 1))
-	echo -n "$count "
+	((count++))
+	printf "%d " $count
 	sed "s|^$HOME|~|" <<< "$filename"
 done
 
