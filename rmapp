@@ -2,7 +2,7 @@
 # shellcheck disable=SC2001
 
 progname="rmapp"
-version=1.0.1
+version=1.0.2
 
 if ! [[ "$OSTYPE" =~ ^darwin ]]; then
 	echo "This program is only works on macOS." >&2
@@ -126,7 +126,7 @@ IFS="$oldifs"
 
 if [ "$mode" = check ]; then
 	for filename in "${items[@]}"; do
-		sed "s|^$HOME|~|" <<< "$filename"
+		sed "s|^$HOME/|~/|" <<< "$filename"
 	done
 	exit
 fi
@@ -154,7 +154,7 @@ count=0
 for filename in "${items[@]}"; do
 	((count++))
 	printf "%d " $count
-	sed "s|^$HOME|~|" <<< "$filename"
+	sed "s|^$HOME/|~/|" <<< "$filename"
 done
 
 read -r -p "Enter the number of the files/dirs you want to delete: " answer
