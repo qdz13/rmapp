@@ -3,7 +3,7 @@ MANPREFIX = ${PREFIX}/share/man
 RM = rm -f
 
 all:
-	@echo "Run \"sudo make install\" to install rmapp."
+	@echo 'Run "sudo make install" to install rmapp.'
 
 install:
 	mkdir -p ${DESTDIR}${PREFIX}/bin
