@@ -2,7 +2,7 @@
 # shellcheck disable=SC2001
 
 progname="rmapp"
-version=1.0.2
+version=1.0.3
 
 if ! [[ "$OSTYPE" =~ ^darwin ]]; then
 	echo "This program is only works on macOS." >&2
@@ -20,6 +20,11 @@ usage() {
 		  -v, --version Display version information and exit
 		EOF
 }
+
+if [ $# -eq 0 ]; then
+	usage
+	exit 1
+fi
 
 optend=false
 mode=normal
